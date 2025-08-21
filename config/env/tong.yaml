@@ -1,0 +1,41 @@
+# @package _global_
+
+env:
+  name: tong
+
+  eps_steps: 10000 # time limit of a episode
+
+  state_dim: 14
+  image_dim: [3, 720, 1280]
+  
+  left_camera_intrinsic: [678.34851139, 678.45026752, 632.56713095, 364.26686034]  # (fx, fy, cx, cy), 1280x720
+  right_camera_intrinsic: [678.51050076, 678.5472754, 631.9648702, 364.68832815]  # (fx, fy, cx, cy), 1280x720
+
+expert:
+  task_type: PenInCup
+  num_sub_task: 2
+
+  bgr: true # if images of demos is BGR or not (RGB)
+
+  train_demos: 150
+  test_demos: 10
+
+  train_path: ["/path/to/train/dataset"]
+  test_path: ["/path/to/test/dataset"]
+
+agent:
+  # PenInCup
+  manipulation_model_path: path/to/manipulation/model/dir
+  gaze_model_path: path/to/gaze/model/dir
+  
+  # pointcloud
+  num_points: 10000
+  num_pcd_group: 5
+  pcd_group_size: 2000
+  
+  # focal vision
+  crop_size_pcd: 0.2 # m, diameter
+  crop_size_image: 250 # px
+
+  # thresh
+  gaze_replacement_thresh: 300 # px

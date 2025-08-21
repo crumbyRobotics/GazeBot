@@ -1,0 +1,41 @@
+# @package _global_
+
+env:
+  name: tongsim
+
+  eps_steps: 10000 # time limit of a episode
+
+  state_dim: 14
+  image_dim: [3, 180, 320]
+
+  left_camera_intrinsic:  [174.609376, 174.609369, 160, 90]  # (fx, fy, cx, cy), 320x180
+  right_camera_intrinsic:  [174.609376, 174.609369, 160, 90]  # (fx, fy, cx, cy), 320x180
+
+expert:
+  task_type: PileBox
+  num_sub_task: 2
+
+  bgr: false # if images of demos is BGR or not (RGB)
+  
+  train_demos: 100
+  test_demos: 10
+  
+  train_path: ["/path/to/train/dataset"]
+  test_path: ["/path/to/test/dataset"]
+
+agent:
+  # PileBox
+  manipulation_model_path: ./weights
+  gaze_model_path: ./weights
+
+  # pointcloud
+  num_points: 4000
+  num_pcd_group: 5
+  pcd_group_size: 500
+  
+  # focal vision
+  crop_size_pcd: 0.2 # m, diameter
+  crop_size_image: 60 # px
+
+  # thresh
+  gaze_replacement_thresh: 25 # px

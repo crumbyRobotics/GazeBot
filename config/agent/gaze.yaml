@@ -1,0 +1,17 @@
+# @package _global_
+
+agent:
+  name: gaze
+  
+  lr: 1e-5
+  weight_decay: 1e-3
+
+  small_image_dim: [3, 224, 224]
+  super_res: 4
+
+train:
+  learn_steps: 20000
+  max_epoch: 10
+  batch: 2
+
+save_step_interval: [4000, 6000, 8000, 10000] # Save state_dict every this many steps

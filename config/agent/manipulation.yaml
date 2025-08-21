@@ -1,0 +1,36 @@
+# @package _global_
+
+agent:
+  name: manipulation
+
+  lr: 1e-5
+  
+  weight_decay: 1e-4
+
+  # manipulation dataset
+  num_queries: 50
+  bottleneck_thresh: 1.0
+  minimum_step_ratio: 0.35
+  
+  # transformer policy
+  hidden_dim: 512
+  dropout: 0.1
+  nheads: 8
+  dim_feedforward: 3200
+  enc_layers: 4
+  dec_layers: 7
+  pre_norm: false
+
+  # pointcloud
+  pcd_mask_ratio: 0
+  max_pcd_token_length: 100
+
+  # thresholds
+  progress_thresh: 0.9
+  convergence_thresh: 0.1 # in normalized state space
+  bezier_vector_thresh: 0.4 # criterion: convergence_thresh * 4
+
+train:
+  learn_steps: 2e5  
+  max_epoch: 60
+  batch: 8

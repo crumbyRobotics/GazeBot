@@ -1,0 +1,23 @@
+project_name: ${env.name}
+
+cuda_deterministic: true
+device: ??? # to be specified later
+cuda_device: 0
+
+num_workers: 8
+
+wandb: true
+
+seed: 0
+
+val_interval: 1 # epochs
+val_niter: 10 # batches
+log_interval: 100  # Log every this many steps
+save_interval: 1000 # Update saved state_dict every this many steps
+save_step_interval: [60000, 80000, 100000, 150000] # Save state_dict every this many steps
+log_dir: logs
+hydra_base_dir: ""
+
+defaults:
+  - env: tongsim
+  - agent: manipulation

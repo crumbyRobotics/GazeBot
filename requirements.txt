@@ -1,0 +1,18 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.7.1+cu118
+torchvision==0.22.1+cu118
+hydra-core==1.3.2
+open3d==0.19.0
+einops==0.8.1
+spconv-cu118==2.3.8
+wandb==0.20.1
+groundingdino-py==0.4.0
+
+# packages for tongsystem
+numpy<2.3.0 # 2.3.0 or later require newer GCC versions
+pyzmq
+gym<0.24.0 # interface updates in >= 0.25.0. version 0.24.x is unrecommended officially.
+opencv-python
+Cython
+h5py
+pynput
