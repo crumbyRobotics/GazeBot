@@ -8,9 +8,7 @@ The University of Tokyo
 IEEE Robotics and Automation Letters (RA-L), 2025
 </span>
 
-
-<img src="image.jpg" width="500">
-
+<img centering src="image.jpg" width="1000">
 
 ## Installation
 
