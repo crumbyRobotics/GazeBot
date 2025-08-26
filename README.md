@@ -31,7 +31,7 @@ IEEE Robotics and Automation Letters (RA-L), 2025
 ## Running with Tongsim
 
 1. **Download tongsim:** [https://github.com/crumbyRobotics/tong_simulator](https://github.com/crumbyRobotics/tong_simulator)
-2. **Download model parameters from:**
+2. **[Download model parameters](https://drive.google.com/file/d/12NWEoUUQgzvf7_B3Rhu9OoL04bdz0JL5/view?usp=sharing)**:
     ```sh
     mkdir weights && cd weights
     unzip [your_downloaded_zip_file] -d .

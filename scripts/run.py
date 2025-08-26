@@ -63,7 +63,6 @@ def main(cfg: DictConfig):
     print("------------------------\n")
     for epoch in count():
         obs = env.reset(random_init=True)
-        done = False
 
         # parameters of state machine
         sm = StateMachine(
@@ -115,11 +114,7 @@ def main(cfg: DictConfig):
             action, vis = action_process(manipulation_agent, obs, gaze, sm, metrics, CONVERGENCE_THRESH)
 
             # Step Env
-            obs, _, done, _ = env.step(action, gaze[0].cpu().numpy())
-
-            if done:
-                success_count += 1
-                break
+            obs, _, _, _ = env.step(action, gaze[0].cpu().numpy())
 
             # Update StateMachine
             if sm.progress[0, sm.sub_task_idx] > PROGRESS_THRESH - 0.05:
@@ -136,7 +131,7 @@ def main(cfg: DictConfig):
 
         # env.save_log()
         env.reset_log()
-        print(f"[Info] episode: {epoch}, steps: {episode_step}, {'SUCCESS' if done else 'FAILURE'}")
+        print(f"[Info] episode: {epoch}, steps: {episode_step}")
 
         if abort_flag:
             break
