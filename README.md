@@ -55,12 +55,12 @@ Both the arm and gaze behaviors are scripted in this case — see [`tong_system/
 
 
 Launch the simulator (Terminal 1):
-```
+```sh
 cd tong_simulator
 python main.py --sim_device cpu
 ```
 Run the example program (Terminal 2):
-```
+```sh
 cd tong_system/tests
 python test_sim.py
 ```
