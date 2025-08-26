@@ -51,7 +51,7 @@ IEEE Robotics and Automation Letters (RA-L), 2025
 ## Training (with your demonstration file containing gaze data)
 ### 0. Create Demonstration Files (PileBox)
 You can generate demonstration files for the PileBox task using the `tong_system` test program.  
-Both the arm and gaze behaviors are scripted in this case — see [`tong_system/tests/controller.py`](tong_system/tests/controller.py) for details.
+Both the arm and gaze behaviors are scripted in this case — see [`tong_system/tests/controller.py`](https://github.com/crumbyRobotics/tong_system/blob/master/tests/controller.py) for details.
 
 
 Launch the simulator (Terminal 1):
