@@ -10,6 +10,7 @@ import torchvision.transforms.functional as VF
 
 from gazebot.train import get_args, load_agent
 from gazebot.agent import create_manipulation_agent
+from gazebot.utils import to_absolute_path
 
 
 @hydra.main(config_path="../config", config_name="config", version_base="1.1")
@@ -23,7 +24,7 @@ def main(cfg: DictConfig):
     args.agent.dim_feedforward = 1024
     agent = create_manipulation_agent(args)
 
-    localbc_path = hydra.utils.to_absolute_path("path/to/localbc/model/dir")  # NOTE Specify trained localbc path
+    localbc_path = to_absolute_path("path/to/localbc/model/dir")  # NOTE Specify trained localbc path
     localbc_agent = load_agent(agent, localbc_path, args, ignore_error=False)
 
     save_localbc_loss(localbc_agent, args)
@@ -40,7 +41,7 @@ def save_localbc_loss(agent, args):
 
     LOSS_WEIGHTS = [5.0, 5.0, 5.0, 1.0, 1.0, 1.0, 0]
 
-    data_dir = [hydra.utils.to_absolute_path(os.path.expanduser(dir_path)) for dir_path in args.expert.train_path + args.expert.test_path]
+    data_dir = [os.path.expanduser(dir_path) for dir_path in args.expert.train_path + args.expert.test_path]
     all_episodes = np.array([os.path.join(d, f) for d in data_dir for f in os.listdir(d) if "h5" in f])
 
     for eps_idx, episode_file in enumerate(all_episodes):
@@ -74,7 +75,13 @@ def save_localbc_loss(agent, args):
                     e["right_f_hstate"][init_step : change_step - 1, [6]]
                 )  # (N, GRIPPER_DOF), Use hstate as action for pseudo force control of the gripper
                 action_pose_seq = np.concatenate(
-                    (action_left_arm, action_left_gripper, action_right_arm, action_right_gripper), axis=1
+                    (
+                        action_left_arm,
+                        action_left_gripper,
+                        action_right_arm,
+                        action_right_gripper,
+                    ),
+                    axis=1,
                 )  # (N, state_dim)
 
                 for step in range(init_step, change_step - 1):
@@ -91,7 +98,11 @@ def save_localbc_loss(agent, args):
                     obs["state"] = torch.as_tensor(obs["state"], dtype=torch.float, device=agent.device)
                     obs["state"] = (obs["state"] - agent.model.state_mean) / agent.model.state_std
                     obs["image"] = torch.as_tensor(obs["image"], dtype=torch.float, device=agent.device)
-                    obs["image"] = VF.normalize(obs["image"], mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                    obs["image"] = VF.normalize(
+                        obs["image"],
+                        mean=[0.485, 0.456, 0.406],
+                        std=[0.229, 0.224, 0.225],
+                    )
                     if obs["image"].shape[1:] != torch.Size(args.env.image_dim[1:]):
                         obs["image"] = VF.resize(obs["image"], size=args.env.image_dim[1:])
                     obs["depth"] = torch.as_tensor(obs["depth"], dtype=torch.float, device=agent.device)
@@ -121,8 +132,14 @@ def save_localbc_loss(agent, args):
                     action_pose = action_pose_seq[step : step + agent.model.localbc_action_chunk_size]  # (Ntraj, state_dim)
                     action_pose_hat = denormalize(action_pose_hat)[0].detach().cpu().numpy()[: len(action_pose)]  # (Ntraj, state_dim)
 
-                    left_loss_action = np.average((action_pose_hat[0, :7] - action_pose[0, :7]) ** 2, weights=np.array(LOSS_WEIGHTS) ** 2)
-                    right_loss_action = np.average((action_pose_hat[0, 7:] - action_pose[0, 7:]) ** 2, weights=np.array(LOSS_WEIGHTS) ** 2)
+                    left_loss_action = np.average(
+                        (action_pose_hat[0, :7] - action_pose[0, :7]) ** 2,
+                        weights=np.array(LOSS_WEIGHTS) ** 2,
+                    )
+                    right_loss_action = np.average(
+                        (action_pose_hat[0, 7:] - action_pose[0, 7:]) ** 2,
+                        weights=np.array(LOSS_WEIGHTS) ** 2,
+                    )
 
                     # Log history for visualize
                     localbc_losses.append([left_loss_action, right_loss_action])

@@ -1,18 +1,20 @@
 from omegaconf import open_dict
 import hydra
 
+from .utils import to_absolute_path
 from .agent import create_gaze_agent, create_manipulation_agent
 from .train import state_action_metrics, load_agent
-from .env_wrapper import TongSystemObsWrapper, TongSystemActionWrapper
-
-from tongsystem import TongSystemFixedNeck, TongSystemUseOnlyLeftArm
+from .env_wrapper import TongSystemObsWrapper, SingleArmActionWrapper
 
 
 def make_env(args):
+    from tongsystem import TongSystemFixedNeck, TongSystemUseOnlyLeftArm
+
     # NOTE various initial poses for the robot
     # fmt: off
     init_poses = [
-        [-0.8516850, -1.5127810, 1.8618909, -2.3572762, -1.2322809, 1.5295182, 16.0550690, 0.8669366, -1.6407274, -1.7815359, -0.8877410, 1.1811637, -1.5764903, -21.7168102, 0.0, -0.9],
+        [-0.7846016,-1.4776526, 1.5353776,-1.5696033,-1.4987375, 1.5185992, 30.0091313, 0.7999979,-1.4999771,-1.4999872,-1.4999983, 1.5000194,-1.5000166,-29.9994907, 0.0, -0.9],
+        # [-0.8516850, -1.5127810, 1.8618909, -2.3572762, -1.2322809, 1.5295182, 16.0550690, 0.8669366, -1.6407274, -1.7815359, -0.8877410, 1.1811637, -1.5764903, -21.7168102, 0.0, -0.9],
         # [-0.837758, -0.575959, 1.492257, -2.49425003, -1.06465, 1.1894419, 11.001, 0.8669366, -1.6407274, -1.7815359, -0.8877410, 1.1811637, -1.5764903, -21.7168102, 0.000, -0.900],
         # [-0.97337012, -0.59358648, 1.0400417, -2.022313, -0.4171337, 1.4081316, 1.001, 0.8669366, -1.6407274, -1.7815359, -0.8877410, 1.1811637, -1.5764903, -21.7168102, 0.000, -0.900],
         # [-0.7470009, -0.9711012, 2.284636, -3.07178, -1.15192, 1.62316, 20.0, 0.8669366, -1.6407274, -1.7815359, -0.8877410, 1.1811637, -1.5764903, -21.7168102, 0.000, -0.900],
@@ -46,7 +48,7 @@ def make_env(args):
         metrics["state_std"],
         args.device,
     )
-    # env = TongSystemActionWrapper(env, control_arm="left") # NOTE single arm
+    # env = SingleArmActionWrapper(env, control_arm="left") # NOTE enable when TongSystemUseOnlyLeftArm is used
 
     return env, metrics
 
@@ -54,14 +56,16 @@ def make_env(args):
 def make_agent(args, ignore_error=False):
     assert args.agent.name == "manipulation"
 
-    # TODO adhoc configure
+    # TODO Fix adhoc configuration
     assert not hasattr(args.agent, "super_res") and not hasattr(args.agent, "small_image_dim")
     with open_dict(args.agent):
         args.agent.super_res = 4
         args.agent.small_image_dim = [3, 224, 224]
 
+    args.agent.name = "gaze"
     gaze_agent = make_gaze_agent(args, ignore_error)
 
+    args.agent.name = "manipulation"
     manipulation_agent = make_manipulation_agent(args, ignore_error)
 
     return gaze_agent, manipulation_agent
@@ -70,7 +74,7 @@ def make_agent(args, ignore_error=False):
 def make_manipulation_agent(args, ignore_error=False):
     agent = create_manipulation_agent(args)
 
-    model_path = hydra.utils.to_absolute_path(args.agent.manipulation_model_path)
+    model_path = to_absolute_path(args.agent.manipulation_model_path)
     load_agent(agent, model_path, args, ignore_error)
 
     agent.eval()
@@ -81,7 +85,7 @@ def make_manipulation_agent(args, ignore_error=False):
 def make_gaze_agent(args, ignore_error=False):
     agent = create_gaze_agent(args)
 
-    model_path = hydra.utils.to_absolute_path(args.agent.gaze_model_path)
+    model_path = to_absolute_path(args.agent.gaze_model_path)
     load_agent(agent, model_path, args, ignore_error)
 
     agent.eval()

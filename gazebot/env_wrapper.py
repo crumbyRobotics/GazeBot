@@ -43,7 +43,7 @@ class TongSystemObsWrapper(gym.ObservationWrapper):
         return self.observation(observation), reward, done, info
 
 
-class TongSystemActionWrapper(gym.ActionWrapper):
+class SingleArmActionWrapper(gym.ActionWrapper):
     def __init__(self, env, control_arm=None):
         super().__init__(env)
         self.action_space = spaces.Box(low=-np.inf, high=np.inf, shape=(14,))
@@ -61,3 +61,6 @@ class TongSystemActionWrapper(gym.ActionWrapper):
                 return action[7:14]
         else:
             return action
+
+    def step(self, action, *args, **kwargs):
+        return self.env.step(self.action(action), *args, **kwargs)

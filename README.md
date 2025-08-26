@@ -21,7 +21,10 @@ IEEE Robotics and Automation Letters (RA-L), 2025
     ```sh
     ./env_setup.sh
     ```
-> **Note:** If you change your GPU type (e.g., switch GPU servers), rerun the setup script.
+
+    > **Note:** When installing `pytorch3d` and `pointops`, ensure your CUDA version matches the one used by your PyTorch installation (check with `nvcc --version`). Also, set the `CUDA_HOME` environment variable to point to your CUDA installation directory. 
+
+> **Note:** If you switch to a different GPU (e.g., change GPU servers), rerunning the setup script is recommended.
 
 ---
 
@@ -46,9 +49,23 @@ IEEE Robotics and Automation Letters (RA-L), 2025
 ---
 
 ## Training (with your demonstration file containing gaze data)
-Please refer to the sample demo file: 
+### 0. Create Demonstration Files (PileBox)
+You can generate demonstration files for the PileBox task using the `tong_system` test program.  
+Both the arm and gaze behaviors are scripted in this case — see [`tong_system/tests/controller.py`](tong_system/tests/controller.py) for details.
 
-### 0. Segment Demonstrations into Sub-tasks
+
+Launch the simulator (Terminal 1):
+```
+cd tong_simulator
+python main.py --sim_device cpu
+```
+Run the example program (Terminal 2):
+```
+cd tong_system/tests
+python test_sim.py
+```
+
+### 1. Segment Demonstrations into Sub-tasks
 
 Add `change_steps` data to your `.h5` files.  
 - `change_steps` marks the steps where sub-tasks switch (include 0 and the last step).
@@ -70,15 +87,15 @@ You can annotate manually, but gaze-based task decomposition is recommended for 
 > Please review the code for optimal performance on your setup.
 
 
-### 1. Train Gaze Model & LocalBC Model
+### 2. Train Gaze Model & LocalBC Model
 
 - Edit config files as needed (e.g., set `agent: gaze` in `config.yaml` for `train_gaze.py`).
 - Training progress is tracked with [Weights & Biases](https://wandb.ai/).
 
 Train models:
 ```sh
-python scripts/train_gaze.py # ~6 hours in A100 GPU
-python scripts/train_localbc.py # ~10 hours in A100 GPU
+python scripts/train_gaze.py # 3~6 hours in A100 GPU
+python scripts/train_localbc.py # 5~10 hours in A100 GPU
 ```
 Trained weights are saved in `outputs/yyyy-mm-dd/hh-mm-ss/results`.
 
@@ -88,7 +105,7 @@ Visualization notebooks:
 
 ---
 
-### 2. Save LocalBC Loss
+### 3. Save LocalBC Loss
 
 The bottleneck step is determined by the action prediction loss of the LocalBC model.
 
@@ -102,11 +119,11 @@ Before training the manipulation model, save the action prediction loss to `.h5`
 
 ---
 
-### 3. Train Manipulation Model
+### 4. Train Manipulation Model
 
 Train the manipulation model:
 ```sh
-python scripts/train_manipulation.py # ~20 hours in A100 GPU
+python scripts/train_manipulation.py # 10~20 hours in A100 GPU
 ```
 
 

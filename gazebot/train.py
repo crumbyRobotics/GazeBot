@@ -22,7 +22,6 @@ def get_args(cfg: DictConfig, random_seed=False):
 
     cfg.hydra_base_dir = os.getcwd()
 
-    # Serverの空いているGPUを指定するとよい
     cfg.device = cfg.cuda_device if torch.cuda.is_available() else "cpu"
     print(OmegaConf.to_yaml(cfg))
 
@@ -45,39 +44,20 @@ def state_action_metrics(args):
     if args.env.name == "tongsim":
         if args.expert.task_type == "PileBox":
             # fmt: off
-            state_mean = [-0.6068457, 0.3021088,-0.3056861, 3.0657687,-0.0642200,-0.7288149, 0.4018294,
-                          0.4587743, 0.2815206, 0.2600906, 3.0862043,-0.2168547, 0.7276848,-0.5235988]
-            state_std = [0.0479745, 0.0433459, 0.1536488, 0.0003788, 0.0027617, 0.0006637, 0.1149221,
+            state_mean = [-0.6178197, 0.3081605,-0.3037394, 3.0658113,-0.0648667,-0.7287459, 23.0428536,
+                         0.4412798, 0.2655290, 0.2491616, 3.0862228,-0.2168896, 0.7276989,-29.9994907]
+            state_std = [0.0430991, 0.0466196, 0.1397928, 0.0003017, 0.0016059, 0.0007517, 6.9921434,
                          0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000]
-            action_pose_mean = [-0.6078158, 0.3023462,-0.3084407, 3.0657675,-0.0642120,-0.7288125, 0.3473460,
-                                0.4587743, 0.2815206, 0.2600906, 3.0862043,-0.2168547, 0.7276848,-0.5235988]
-            action_pose_std = [0.0463780, 0.0433578, 0.1497415, 0.0003796, 0.0027676, 0.0006649, 0.1651571,
+            action_pose_mean = [-0.6187532, 0.3083421,-0.3065747, 3.0658065,-0.0649308,-0.7287221, 20.2147219,
+                                0.4412798, 0.2655290, 0.2491616, 3.0862228,-0.2168896, 0.7276989,-30.0000000]
+            action_pose_std = [0.0416144, 0.0467121, 0.1356359, 0.0002964, 0.0013933, 0.0006923, 9.7077571,
                                0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000]
             # fmt: on
 
         else:
             raise NotImplementedError
 
-        state_std[:3] = np.clip(state_std[:3], 0.03, None)
-        state_std[7:10] = np.clip(state_std[7:10], 0.03, None)
-        state_std[3:7] = np.clip(state_std[3:7], 0.01, None)
-        state_std[10:14] = np.clip(state_std[10:14], 0.01, None)
-        state_std[6] = np.clip(state_std[6], 0.1, None)
-        state_std[13] = np.clip(state_std[13], 0.1, None)
-
-        action_pose_std[:3] = np.clip(action_pose_std[:3], 0.03, None)
-        action_pose_std[7:10] = np.clip(action_pose_std[7:10], 0.03, None)
-        action_pose_std[3:7] = np.clip(action_pose_std[3:7], 0.01, None)
-        action_pose_std[10:14] = np.clip(action_pose_std[10:14], 0.01, None)
-        action_pose_std[6] = np.clip(action_pose_std[6], 0.1, None)
-        action_pose_std[13] = np.clip(action_pose_std[13], 0.1, None)
-
-        if args.agent.name == "manipulation":
-            # General metrics
-            state_std = [0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.15, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.15]  # NOTE better performance?
-
     elif args.env.name == "tong":
-        # NOTE gripper angle of real robot is not radian but degree (it is not problematic due to the normalization)
         if args.expert.task_type == "PenInCup":
             # fmt: off
             state_mean = [-0.6352632, 0.3386952,-0.1137690, 2.2742393, 0.1969251,-0.6800710, 12.0330992,
@@ -93,28 +73,28 @@ def state_action_metrics(args):
         else:
             raise NotImplementedError
 
-        state_std[:3] = np.clip(state_std[:3], 0.03, None)
-        state_std[7:10] = np.clip(state_std[7:10], 0.03, None)
-        state_std[3:7] = np.clip(state_std[3:7], 0.01, None)
-        state_std[10:14] = np.clip(state_std[10:14], 0.01, None)
-        state_std[6] = np.clip(state_std[6], 4, None)
-        state_std[13] = np.clip(state_std[13], 4, None)
-
-        action_pose_std[:3] = np.clip(action_pose_std[:3], 0.03, None)
-        action_pose_std[7:10] = np.clip(action_pose_std[7:10], 0.03, None)
-        action_pose_std[3:7] = np.clip(action_pose_std[3:7], 0.05, None)
-        action_pose_std[10:14] = np.clip(action_pose_std[10:14], 0.05, None)
-        action_pose_std[6] = np.clip(action_pose_std[6], 4, None)
-        action_pose_std[13] = np.clip(action_pose_std[13], 4, None)
-
-        if args.agent.name == "manipulation":
-            # General metrics
-            # fmt: off
-            state_std = [0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 8.594367, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 8.594367]  # NOTE better performance? <- state_stdの0.1のミスのせいだけかも
-            # fmt: on
-
     else:
         raise NotImplementedError
+
+    state_std[:3] = np.clip(state_std[:3], 0.03, None)
+    state_std[7:10] = np.clip(state_std[7:10], 0.03, None)
+    state_std[3:7] = np.clip(state_std[3:7], 0.01, None)
+    state_std[10:14] = np.clip(state_std[10:14], 0.01, None)
+    state_std[6] = np.clip(state_std[6], 4, None)
+    state_std[13] = np.clip(state_std[13], 4, None)
+
+    action_pose_std[:3] = np.clip(action_pose_std[:3], 0.03, None)
+    action_pose_std[7:10] = np.clip(action_pose_std[7:10], 0.03, None)
+    action_pose_std[3:7] = np.clip(action_pose_std[3:7], 0.05, None)
+    action_pose_std[10:14] = np.clip(action_pose_std[10:14], 0.05, None)
+    action_pose_std[6] = np.clip(action_pose_std[6], 4, None)
+    action_pose_std[13] = np.clip(action_pose_std[13], 4, None)
+
+    if args.agent.name == "manipulation":
+        # General metrics
+        # fmt: off
+        state_std = [0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 8.594367, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 8.594367]  # NOTE better performance? <- state_stdの0.1のミスのせいだけかも
+        # fmt: on
 
     return state_mean, state_std, action_pose_mean, action_pose_std
 

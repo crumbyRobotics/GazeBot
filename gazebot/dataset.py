@@ -15,8 +15,8 @@ def create_gaze_dataset(args):
     TRAIN_MAX_DEMO_NUM = int(args.expert.train_demos)
     TEST_MAX_DEMO_NUM = int(args.expert.test_demos)
 
-    train_data_dir = [hydra.utils.to_absolute_path(os.path.expanduser(train_dir)) for train_dir in args.expert.train_path]
-    test_data_dir = [hydra.utils.to_absolute_path(os.path.expanduser(test_dir)) for test_dir in args.expert.test_path]
+    train_data_dir = [os.path.expanduser(train_dir) for train_dir in args.expert.train_path]
+    test_data_dir = [os.path.expanduser(test_dir) for test_dir in args.expert.test_path]
 
     train_dataset = GazeDataset(train_data_dir, TRAIN_MAX_DEMO_NUM, args.expert.bgr)
     test_dataset = GazeDataset(test_data_dir, TEST_MAX_DEMO_NUM, args.expert.bgr)
@@ -27,8 +27,8 @@ def create_gaze_dataset(args):
 def create_manipulation_dataset(args):
     TRAIN_MAX_DEMO_NUM = int(args.expert.train_demos)
     TEST_MAX_DEMO_NUM = int(args.expert.test_demos)
-    train_data_dir = [hydra.utils.to_absolute_path(os.path.expanduser(train_dir)) for train_dir in args.expert.train_path]
-    test_data_dir = [hydra.utils.to_absolute_path(os.path.expanduser(test_dir)) for test_dir in args.expert.test_path]
+    train_data_dir = [os.path.expanduser(train_dir) for train_dir in args.expert.train_path]
+    test_data_dir = [os.path.expanduser(test_dir) for test_dir in args.expert.test_path]
 
     try:
         state_mean, state_std, action_pose_mean, action_pose_std = state_action_metrics(args)

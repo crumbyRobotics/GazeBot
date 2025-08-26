@@ -1,4 +1,5 @@
 import io
+import os
 import numpy as np
 import torch
 from torch import nn
@@ -7,6 +8,14 @@ import cv2
 import open3d as o3d
 from PIL import Image
 import matplotlib.pyplot as plt
+
+
+def to_absolute_path(path):
+    """
+    Convert a relative path to an absolute path.
+    The relative path in this project is relative to the root directory.
+    """
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, path))
 
 
 class AverageMeter(object):
